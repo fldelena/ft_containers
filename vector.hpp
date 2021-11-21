@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <string>
-// #include <memory>
+#include <memory>
 
 
 namespace ft
@@ -15,12 +15,22 @@ namespace ft
     public:
         //----------------------Typedef-----------------------//
 
-        typedef         T                   value_type;
-        typedef         std::size_t         size_type;
-        typedef         Alloc               allocator_type;
+        typedef         T                       value_type;
+        typedef         Alloc                   allocator_type;
+        typedef         std::size_t             size_type;
+        // typedef         Alloc::reference        reference;
+        // typedef         Alloc::const_reference  const_reference;
+        // typedef         Alloc::pointer          pointer;
+        // typedef         Alloc::const_pointer    const_pointer;
+        // typedef         random_access_iterator  iterator;
+        // typedef         random_access_iterator  const_iterator;
 
-        //----------------------param-------------------------//
+
+
+
+
     private:
+        //----------------------Param-------------------------//
         value_type*     _arr;                 
         size_type       _size;
         size_type       _capacity;
@@ -37,7 +47,7 @@ namespace ft
         {
             _arr = _alloc.allocate(n);
             for(size_type i = 0; i < n; i++)
-                _arr[i] = val; // НЕПРВАВИЛЬНО
+                _alloc.construct(_arr + i, val);
         }
 
         // template <class InputIterator>
@@ -48,6 +58,16 @@ namespace ft
         vector (const vector& x) {*this = x;}
 
 
+        //----------------------Iterators---------------------//
+        iterator begin()
+        {
+            return();
+        }
+
+        const_iterator begin() const
+        {
+            return();
+        }
 
         //----------------------Capacity----------------------//
 
@@ -58,7 +78,7 @@ namespace ft
 
         size_type max_size() const
         {
-            return (4611686018427387903);
+            return (_alloc.max_size());
         }
 
         void resize (size_type n, value_type val = value_type())
@@ -82,6 +102,20 @@ namespace ft
             }
         }
 
+        size_type capacity() const
+        {
+            return(_capacity);
+        }
+
+        bool empty() const
+        {
+            if(_size == 0)
+                return(true);
+            else
+                return(false);
+
+        }
+
         void reserve (size_type n)
         {
             if(n > _capacity)
@@ -102,3 +136,8 @@ namespace ft
 
 
 #endif
+
+
+//Повторить
+//typename
+//template

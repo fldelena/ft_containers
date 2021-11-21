@@ -6,13 +6,12 @@
 
 int main()
 {
-    std::vector<int> arr(5, 10);
-    // ft::vector<int> ars(11, 9);
+    std::vector<int> arr;
+    ft::vector<int> ars(11, 9);
 
-    std::cout << "size:\t" << arr.size() << " cap:\t" <<  arr.capacity() << std::endl;
+    std::cout << "max_size:\t" << arr.max_size() << " cap:\t" <<  arr.capacity() << std::endl;
+    std::cout << "max_size:\t" << ars.max_size() << " cap:\t" <<  ars.capacity() << std::endl;
 
-    arr.resize(12);
-    std::cout << "size:\t" << arr.size() << " cap:\t" <<  arr.capacity() << std::endl;
     // std::cout <<  "maxSize:\t" << arr.max_size() << std::endl;
 
     std::vector<int>::iterator it = arr.begin();
