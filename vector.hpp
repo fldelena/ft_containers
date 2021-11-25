@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include "iterator/random_access_iterator.hpp"
 
 
 namespace ft
@@ -22,8 +23,8 @@ namespace ft
         // typedef         Alloc::const_reference  const_reference;
         // typedef         Alloc::pointer          pointer;
         // typedef         Alloc::const_pointer    const_pointer;
-        // typedef         random_access_iterator  iterator;
-        // typedef         random_access_iterator  const_iterator;
+        typedef         random_access_iterator<T>  iterator;
+        typedef         random_access_iterator<T>  const_iterator;
 
 
 
@@ -61,12 +62,12 @@ namespace ft
         //----------------------Iterators---------------------//
         iterator begin()
         {
-            return();
+            return(iterator(_arr));
         }
 
-        const_iterator begin() const
+        iterator end()
         {
-            return();
+            return(iterator(_arr + _size));
         }
 
         //----------------------Capacity----------------------//
