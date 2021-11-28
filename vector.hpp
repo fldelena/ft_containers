@@ -14,31 +14,32 @@ namespace ft
     class vector
     {
     public:
-        //----------------------Typedef-----------------------//
+        //------------------------------Typedef------------------------------//
 
-        typedef         T                       value_type;
-        typedef         Alloc                   allocator_type;
-        typedef         std::size_t             size_type;
-        // typedef         Alloc::reference        reference;
-        // typedef         Alloc::const_reference  const_reference;
-        // typedef         Alloc::pointer          pointer;
-        // typedef         Alloc::const_pointer    const_pointer;
-        typedef         random_access_iterator<T>  iterator;
-        typedef         random_access_iterator<T>  const_iterator;
+        typedef         T                                   value_type;
+        typedef         T*                                  pointer;
+        typedef         T&                                  reference;
+        typedef         const T*                            const_pionter;
+        typedef         const T&                            const_reference;
+        typedef         ptrdiff_t                           difference_type;
+        typedef         Alloc                               allocator_type;
+        typedef         std::size_t                         size_type;
+        typedef         random_access_iterator<T>           iterator;
+        typedef         random_access_iterator<T>           const_iterator;
 
 
 
 
 
     private:
-        //----------------------Param-------------------------//
+        //-------------------------------Param-------------------------------//
         value_type*     _arr;                 
         size_type       _size;
         size_type       _capacity;
         allocator_type  _alloc;      
 
     public:
-        //---------------------Constructor--------------------//
+        //----------------------------Constructor----------------------------//
         explicit vector(const allocator_type& alloc = allocator_type()) :
         _arr(0), _size(0), _capacity(0), _alloc(alloc) {}
 
@@ -59,7 +60,7 @@ namespace ft
         vector (const vector& x) {*this = x;}
 
 
-        //----------------------Iterators---------------------//
+        //------------------------------Iterators----------------------------//
         iterator begin()
         {
             return(iterator(_arr));
@@ -70,7 +71,7 @@ namespace ft
             return(iterator(_arr + _size));
         }
 
-        //----------------------Capacity----------------------//
+        //------------------------------Capacity-----------------------------//
 
         size_type size() const
         {
@@ -130,6 +131,20 @@ namespace ft
                 _capacity = n;
             }
         }
+
+        //-------------------------Element access----------------------------//
+
+        reference operator[](size_type n)
+        {
+            return(*(this->_arr + n));
+        }
+
+        reference at (size_type n)
+        {
+            
+        }
+
+
     };
 
 }

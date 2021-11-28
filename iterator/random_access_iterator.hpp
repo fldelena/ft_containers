@@ -33,11 +33,21 @@ namespace ft{
         { return(this->_ptr == other._ptr); }
         bool operator!=(random_access_iterator const &other) const
         { return(this->_ptr != other._ptr); }
+        bool operator<(random_access_iterator const &other) const
+        { return(this->_ptr < other._ptr); }
+        bool operator>(random_access_iterator const &other) const
+        { return(this->_ptr > other._ptr); }
+        bool operator<=(random_access_iterator const &other) const
+        { return(this->_ptr <= other._ptr); }
+        bool operator>=(random_access_iterator const &other) const
+        { return(this->_ptr >= other._ptr); }
 
         value_type  &operator*()  { return(*this->_ptr); }
         value_type  *operator->() { return( this->_ptr); }
 
         // *a = t
+        // *a++
+        // *a--
 
         random_access_iterator   &operator++()
         {
@@ -52,13 +62,6 @@ namespace ft{
             return(tmp);
         }
 
-        // random_access_iterator   operator++(int value)
-        // {
-        //     random_access_iterator tmp = *this;
-        //     *(this->_ptr)++;
-        //     return(tmp);
-        // }
-
         random_access_iterator   &operator--()
         {
             this->_ptr--;
@@ -72,25 +75,29 @@ namespace ft{
             return(tmp);
         }
 
-        // random_access_iterator   operator--(int value)
-        // {
-        //     random_access_iterator tmp = *this;
-        //     *(this->_ptr)--;
-        //     return(tmp);
-        // }
-
-        random_access_iterator   operator+(int n) const
+        random_access_iterator  operator+=(ptrdiff_t n)
         {
-            random_access_iterator tmp;
-            this->_ptr + n;
-            return (tmp);
+            this->_ptr += n;
+            return(*this);
         }
 
-        random_access_iterator   operator-(int n) const
+        random_access_iterator  operator-=(ptrdiff_t n)
         {
-            random_access_iterator tmp;
-            this->_ptr - n;
-            return (tmp);
+            this->_ptr -= n;
+            return(*this);
+        }
+
+
+        random_access_iterator   operator+(ptrdiff_t n) const
+        {
+            random_access_iterator tmp(*this);
+            return (tmp += n);
+        }
+
+        random_access_iterator   operator-(ptrdiff_t n) const
+        {
+            random_access_iterator tmp(*this);
+            return (tmp -= n);
         }
 
         random_access_iterator   operator-(random_access_iterator const &other) const
@@ -100,7 +107,14 @@ namespace ft{
             return (tmp);
         }
 
+        value_type &operator[](std::size_t i)
+        {
+            return(*(this->_ptr + i));
+        }
     };
+
+
+
 
 
 
