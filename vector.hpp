@@ -136,14 +136,66 @@ namespace ft
 
         reference operator[](size_type n)
         {
-            return(*(this->_arr + n));
+            return(*(_arr + n));
         }
 
-        reference at (size_type n)
+        reference at(size_type n)
         {
-            
+            if(n < _size)
+                return(*(_arr + n));
+            else
+                throw std::out_of_range("vector");        
         }
 
+        const_reference at(size_type n) const
+        {
+            if(n < _size)
+                return(*(_arr + n));
+            else
+                throw std::out_of_range("vector");     
+        }
+
+        reference front()
+        {
+            return(*_arr);
+        }
+
+        const_reference front() const
+        {
+            return(*_arr);
+        }
+
+        reference back()
+        {
+            return(*(_arr + (_size - 1)));
+        }
+
+        const_reference back() const
+        {
+            return(*(_arr + (_size - 1)));
+        }
+        //----------------------------Modifiers------------------------------//
+
+        // template <class InputIterator>
+        // void assign (InputIterator first, InputIterator last)
+        // {
+        //     // capacity неизменно ну или увеличивается, но не в два раза, а просто;
+
+        // }
+
+        void assign (size_type n, const value_type& val)
+        {
+            if(_capacity < n)
+            {
+                _capacity = n;
+                _arr = _alloc.allocate(_capacity);
+            }
+            _size = n;
+            for(int i = 0; i < _size; i++)
+            {
+                _arr[i] = val;
+            }
+        }
 
     };
 
