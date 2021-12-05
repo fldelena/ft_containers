@@ -40,7 +40,7 @@ namespace ft
 
     public:
         //----------------------------Constructor----------------------------//
-        explicit vector(const allocator_type& alloc = allocator_type()) :
+        explicit vector (const allocator_type& alloc = allocator_type()) :
         _arr(0), _size(0), _capacity(0), _alloc(alloc) {}
 
         explicit vector (size_type n, const value_type& val = value_type(),
@@ -59,6 +59,14 @@ namespace ft
 
         vector (const vector& x) {*this = x;}
 
+        //-----------------------------Destructor----------------------------//
+        // ~vector();
+
+        //--------------------------------=====------------------------------//
+        vector& operator= (const vector& x)
+        {
+            // добавить функцию clear() для отчистки старого вектора
+        }
 
         //------------------------------Iterators----------------------------//
         iterator begin()
@@ -85,23 +93,30 @@ namespace ft
 
         void resize (size_type n, value_type val = value_type())
         {
-            value_type arr_tmp;
+            pointer arr_tmp;
+            size_type old_cap = _capacity;
+            size_type old_siz = _size;
 
             if (n > _capacity)
                 _capacity = ((_capacity * 2) < n) ? n : (_capacity * 2);
-
+            _size = n;
             arr_tmp = _alloc.allocate(_capacity);
-            size_type i = 0;
-            while(i < _size)
+            if(old_siz > _size)
             {
-                arr_tmp[i] = _arr[i];
-                i++;
+                for(size_type i = 0; i < _size; i++)
+                    _alloc.construct(arr_tmp + i, *(_arr + i));
             }
-            while(i < n)
+            else
             {
-                _alloc.construct(arr_tmp[i], _arr[i]);
-                i++;
+                for(size_type i = 0; i < old_siz; i++)
+                    _alloc.construct(arr_tmp + i, *(_arr + i));
+                for(size_type i = old_siz; i < _size; i++)
+                    _alloc.construct(arr_tmp + i, val);
             }
+            for(size_type i = 0; i < _size; i++)
+                _alloc.destroy(_arr + i);
+            _alloc.deallocate(_arr, old_cap);
+            _arr = arr_tmp;
         }
 
         size_type capacity() const
@@ -115,18 +130,18 @@ namespace ft
                 return(true);
             else
                 return(false);
-
         }
 
         void reserve (size_type n)
         {
             if(n > _capacity)
             {
-                value_type arr_tmp = _alloc.allocate(n);
-                for(size_type i = 0; i < _size, i++;)
-                    arr_tmp[i] = _arr[i];
-                _alloc.deallocate(_arr);
-                _alloc.destroy(_arr);
+                pointer arr_tmp = _alloc.allocate(n);
+                for(size_type i = 0; i < _size; i++)
+                    _alloc.construct(arr_tmp + i, *(_arr + i));
+                for(size_type i = 0; i < _size; i++)
+                    _alloc.destroy(_arr + i);
+                _alloc.deallocate(_arr, _size);
                 _arr = arr_tmp;
                 _capacity = n;
             }
@@ -176,15 +191,9 @@ namespace ft
         }
         //----------------------------Modifiers------------------------------//
 
-        // template <class InputIterator>
-        // void assign (InputIterator first, InputIterator last)
-        // {
-        //     // capacity неизменно ну или увеличивается, но не в два раза, а просто;
-
-        // }
-
-        void assign (size_type n, const value_type& val)
+        void assign(size_type n, const value_type& val)
         {
+            // добавить функцию clear() для отчистки старого вектора
             if(_capacity < n)
             {
                 _capacity = n;
@@ -197,6 +206,158 @@ namespace ft
             }
         }
 
+        template <class InputIterator>
+        void assign(InputIterator first, InputIterator last)
+        {
+            size_type       count = 0;
+            InputIterator   tmp;
+
+            count       =   0;
+            tmp         =   first;
+            // добавить функцию clear() для отчистки старого вектора
+            while(tmp != last)
+            {
+                ++count;
+                ++tmp;
+            }
+            if(_capacity < count)
+            {
+                _capacity = count;
+                _arr = _alloc.allocate(_capacity);
+            }
+            _size = count;
+            for(int i = 0; i < _size; i++, first++)
+            {
+                _arr[i] = *first;
+            }
+        }
+        
+        void push_back(const value_type& val)
+        {
+            _size++;
+            if(_capacity == 0)
+            {
+                _capacity = 1;
+                _arr = _alloc.allocate(_capacity);
+            }
+            if(_size > _capacity)
+            {
+                size_type old_capacity = _capacity;
+                _capacity *= 2;
+                pointer arr_tmp = _alloc.allocate(_capacity);
+                for(size_type i = 0; i < _size; i++)
+                    _alloc.construct(arr_tmp + i, *(_arr + i));
+                for(size_type i = 0; i < _size; i++)
+                    _alloc.destroy(_arr + i);
+                _alloc.deallocate(_arr, old_capacity);
+                _arr = arr_tmp;
+                _alloc.construct(_arr + _size - 1, val);
+            }
+            else
+                _alloc.construct(_arr + _size - 1, val);
+        }
+
+        void pop_back()
+        {
+            _size--;
+            _alloc.destroy(_arr + _size);
+        }
+
+        iterator insert (iterator position, const value_type& val)
+        {
+            size_type old_siz = _size;
+            size_type old_cap = _capacity;
+            iterator it_beg = this->begin();
+            size_type pos = 0;
+            for(; it_beg != position; it_beg++)
+                pos++;
+            _size++;
+            if(_capacity == 0)
+            {
+                _capacity = 1;
+                _arr = _alloc.allocate(_capacity);
+            }
+            if(_size > _capacity)
+            {
+                _capacity *= 2;
+                pointer arr_tmp = _alloc.allocate(_capacity);
+                for(size_type i = 0; i < pos; i++)
+                    _alloc.construct(arr_tmp + i, *(_arr + i));
+                _alloc.construct(arr_tmp + pos, val);
+                for(size_type i = pos; (i + 1) < _size; i++)
+                    _alloc.construct(arr_tmp + (i + 1), *(_arr + i));
+                for(size_type i = 0; i < old_siz; i++)
+                    _alloc.destroy(_arr + i);
+                _alloc.deallocate(_arr, old_cap);
+                _arr = arr_tmp;
+            }
+            else
+            {
+                for(size_type i = _size; i > pos; i--)
+                {
+                    _alloc.construct(_arr + i, *(_arr + i - 1));
+                    _alloc.destroy(_arr + (i - 1));
+                }
+                _alloc.construct(_arr + pos, val);
+            }
+            return(iterator(_arr + pos));
+        }
+
+        void insert (iterator position, size_type n, const value_type& val)
+        {
+            size_type old_siz = _size;
+            size_type old_cap = _capacity;
+            iterator it_beg = this->begin();
+            size_type pos = 0;
+            for(; it_beg != position; it_beg++)
+                pos++;
+            _size += n;
+            if(_capacity == 0)
+            {
+                _capacity = 1;
+                _arr = _alloc.allocate(_capacity);
+            }
+            if(_size > _capacity)
+            {
+                std::cout << "debug" <<  std::endl;
+                _capacity = ((_capacity * 2) < _size) ? _size : (_capacity * 2);
+                pointer arr_tmp = _alloc.allocate(_capacity);
+                for(size_type i = 0; i < pos; i++)
+                    _alloc.construct(arr_tmp + i, *(_arr + i));
+                for(size_type i = 0; i < n; i++)
+                    _alloc.construct(arr_tmp + pos + i, val);
+                for(size_type i = (pos + n); i < _size; i++)
+                    _alloc.construct(arr_tmp + i, *(_arr + i - n));
+                for(size_type i = 0; i < old_siz; i++)
+                    _alloc.destroy(_arr + i);
+                _alloc.deallocate(_arr, old_cap);
+                _arr = arr_tmp;
+            }
+            else
+            {
+                for(size_type i = _size; i > (pos + n); i--)
+                {
+                    _alloc.construct(_arr + i, *(_arr + pos + n));
+                    _alloc.construct(_arr + (pos + n));
+                }
+                for(size_type i = 0; i < n; i++)
+                    _alloc.construct(_arr + (pos + i), val);
+            }
+
+        }
+
+
+
+
+        void clear()
+        {
+            if(_arr == 0)
+                return;
+            for(size_type i = 0; i < _size; i++)
+                _alloc.destroy(_arr + _size);
+            _size = 0;
+        }
+
     };
 
 }
@@ -207,5 +368,3 @@ namespace ft
 
 
 //Повторить
-//typename
-//template
