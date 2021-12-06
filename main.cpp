@@ -11,8 +11,8 @@ int main()
     std::vector<int> arr(3, 3);
     std::vector<int>::iterator it = arr.begin();
     std::cout << "size:\t" << arr.size() << " cap:\t" << arr.capacity() << std::endl;
-    it += 5;
-    arr.insert(it, 4, 777);
+    it += 7;
+    arr.insert(it, 3, 777); 
     
     std::cout << "size:\t" << arr.size() << " cap:\t" << arr.capacity() << std::endl;
     std::vector<int>::iterator it_beg = arr.begin();
@@ -33,8 +33,8 @@ int main()
     ft::vector<int> ars(3, 3);
     ft::vector<int>::iterator is = ars.begin();
     std::cout << "size:\t" << ars.size() << " cap:\t" << ars.capacity() << std::endl;
-    is += 5;
-    ars.insert(is, 4, 777);
+    is += 7;
+    ars.insert(is, 3, 777); 
     
     std::cout << "size:\t" << ars.size() << " cap:\t" << ars.capacity() << std::endl;
     ft::vector<int>::iterator it_bis = ars.begin();
