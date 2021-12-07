@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+// #include <stdexcept>
 #include "iterator/random_access_iterator.hpp"
 
 
@@ -265,45 +266,11 @@ namespace ft
 
         iterator insert (iterator position, const value_type& val)
         {
-            size_type old_siz = _size;
-            size_type old_cap = _capacity;
-            iterator it_beg = this->begin();
-            size_type pos = 0;
-            for(; it_beg != position; it_beg++)
-                pos++;
-            _size++;
-            if(_capacity == 0)
-            {
-                _capacity = 1;
-                _arr = _alloc.allocate(_capacity);
-            }
-            if(_size > _capacity)
-            {
-                _capacity *= 2;
-                pointer arr_tmp = _alloc.allocate(_capacity);
-                for(size_type i = 0; i < pos; i++)
-                    _alloc.construct(arr_tmp + i, *(_arr + i));
-                _alloc.construct(arr_tmp + pos, val);
-                for(size_type i = pos; (i + 1) < _size; i++)
-                    _alloc.construct(arr_tmp + (i + 1), *(_arr + i));
-                for(size_type i = 0; i < old_siz; i++)
-                    _alloc.destroy(_arr + i);
-                _alloc.deallocate(_arr, old_cap);
-                _arr = arr_tmp;
-            }
-            else
-            {
-                for(size_type i = _size; i > pos; i--)
-                {
-                    _alloc.construct(_arr + i, *(_arr + i - 1));
-                    _alloc.destroy(_arr + (i - 1));
-                }
-                _alloc.construct(_arr + pos, val);
-            }
-            return(iterator(_arr + pos));
+            this->insert(position, 1, val);
+            return (position);
         }
 
-        void insert (iterator position, size_type n, const value_type& val)
+        void insert (iterator position, int n, const value_type& val)
         {
             if(n == 0)
                 return;
@@ -311,7 +278,7 @@ namespace ft
             size_type old_cap = _capacity;
             iterator it_beg = this->begin();
             size_type pos = 0;
-            for(; it_beg != position; it_beg++)
+            for(; (it_beg != position) && (it_beg != this->end()); it_beg++)
                 pos++;
             int crutch = 0;                 // crutch
             if (pos > _size)                //  |===|
@@ -346,10 +313,15 @@ namespace ft
             }
             else
             {
-                for(size_type i = _size; i > (pos + n); i--)
+                size_type index = 0;
+                if(crutch != 0)                     // crutch
+                    _capacity -= crutch;            // crutch
+                if(n == 2 || n == 1)                // crunch
+                    _capacity += (n == 1) ? 2 : 1;  // crunch
+                for(size_type i =(_size - 1) ; i >= (pos + n); i--)
                 {
-                    _alloc.construct(_arr + i, *(_arr + pos + n));
-                    _alloc.construct(_arr + (pos + n));
+                    _alloc.construct(_arr + i, *(_arr + i - pos - n + 1));
+                    _alloc.destroy(_arr + i - pos - n + 1);
                 }
                 for(size_type i = 0; i < n; i++)
                     _alloc.construct(_arr + (pos + i), val);
@@ -357,8 +329,78 @@ namespace ft
 
         }
 
+        template <class InputIterator>
+        void insert (iterator position, InputIterator first, InputIterator last)
+        {
+            iterator beg = this->begin();
+            size_type pos = 0;
+            for (;beg != position;beg++)
+                pos++;
+            size_type n = 0;
+            InputIterator first_tmp = first;
+            for (;first_tmp != last; first_tmp++)
+                n++;
+            size_type old_cap = _capacity;
+            _size += n;
+            if(_size > _capacity * 2)
+            {   
+                size_type index = 0;
+                _capacity = _size;
+                if(_capacity == 0)
+                    _capacity = n;
+                pointer tmp = _alloc.allocate(_capacity);
+                for(size_type i = 0; i < pos; i++)
+                    _alloc.construct(tmp + i, *(_arr + i));
+                for(size_type i = pos; i < pos + n; i++)
+                    _alloc.construct(tmp + i, *(first + index++));
+                for(size_type i = pos + n; i < _size; i++)
+                    _alloc.construct(tmp + i, *(_arr + i - n));
+                _alloc.deallocate(_arr, old_cap);
+                _arr = tmp;
+            } 
+            else if (_size > _capacity)
+            {
+                size_type index = 0;
+                _capacity *= 2;
+                if (_capacity == 0)
+                    _capacity = n;
+                pointer tmp = _alloc.allocate(_capacity);
+                for(size_type i = 0; i < pos; i++)
+                    _alloc.construct(tmp + i, *(_arr + i));
+                for(size_type i = pos; i < pos + n; i++)
+                    _alloc.construct(tmp + i, *(first + index++));
+                for(size_type i = pos + n; i < _size; i++)
+                    _alloc.construct(tmp + i, *(_arr + i - n));
+                _alloc.deallocate(_arr, old_cap);
+                _arr = tmp;
+            }
+            else
+            {
+                size_type index = n - 1;
+                for (size_type i = _size - 1; i >= pos + n; i--)
+                    _alloc.construct(_arr + i, *(_arr + i - n));
+                for (size_type i = pos + n; i > pos; i--)
+                    _alloc.construct(_arr + i - 1, *(first + index--));
+            }
+        }
 
+        iterator erase (iterator position)
+        {
 
+        }
+
+        iterator erase (iterator first, iterator last)
+        {
+            size_type count = last - first;
+            std::cout << count << std::cout;;
+        }
+
+        void swap (vector& x)
+        {
+            std::swap(this->_arr, x._arr);
+            std::swap(this->_size, x._size);
+            std::swap(this->_capacity, x._capacity);
+        }
 
         void clear()
         {
@@ -375,7 +417,8 @@ namespace ft
 
 
 
+
+
+
+
 #endif
-
-
-//Повторить

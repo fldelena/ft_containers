@@ -102,9 +102,7 @@ namespace ft{
 
         random_access_iterator   operator-(random_access_iterator const &other) const
         {
-            random_access_iterator tmp;
-            this->_ptr - other._ptr;
-            return (tmp);
+            return (this->_ptr - other._ptr);
         }
 
         value_type &operator[](std::size_t i)
