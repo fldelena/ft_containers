@@ -3,26 +3,34 @@
 #include <algorithm>
 #include <cctype>
 #include <utility>
+#include <type_traits>
 #include "vector.hpp"
+
+
+template <class T>
+typename std::enable_if<std::is_integral<T>::value,bool>::type
+  is_odd (T i) {return bool(i%2);}
+
+template <class T, class = typename std::enable_if<std::is_integral<T>::value>::type>
+bool is_even (T i) {return bool(i%2);}
 
 
 int main()
 {
-    
 
-  std::pair <std::string,double> product1;                     // default constructor
-  std::pair <std::string,double> product2 ("tomatoes",2.30);   // value init
-  std::pair <std::string,double> product3 (product2);          // copy constructor
 
-  product1 = std::make_pair(std::string("lightbulbs"),0.99);   // using make_pair (move)
+  short int i = 1;    // code does not compile if type of i is not integral
 
-  product2.first = "shoes";                  // the type of first is string
-  product2.second = 39.90;                   // the type of second is double
+  std::cout << std::boolalpha;
+  std::cout << "i is odd: " << is_odd(i) << std::endl;
+  std::cout << "i is even: " << is_even(i) << std::endl;
 
-  std::cout << "The price of " << product1.first << " is $" << product1.second << '\n';
-  std::cout << "The price of " << product2.first << " is $" << product2.second << '\n';
-  std::cout << "The price of " << product3.first << " is $" << product3.second << '\n';
   return 0;
+
+
+
+
+
 
 
 

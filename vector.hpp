@@ -8,6 +8,9 @@
 #include "iterator/VectorIterator.hpp"
 #include "iterator/ReverseIterator.hpp"
 #include "iterator/LexicographicalCompare.hpp"
+#include "iterator/Pair.hpp"
+#include "iterator/IsIntegral.hpp"
+#include "iterator/EnableIf.hpp"
 
 
 

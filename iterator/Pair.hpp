@@ -4,14 +4,13 @@
 
 /*
 
-ВНЕСТИ НЕМНОЖКО ЯСНОСТИ ПО ПОВОДУ ЭТОЙ ЕРУНДЫ
+Pair - это класс, который объединяет пару значений, которые могут быть разных
+типов. Доступ к отдельным значениям можно получить через его публичные члены
+"first" и "second".
+make_pair - Создает объект pair, первый элемент которого установлен в x,
+а второй - в y.
 
 */
-
-
-
-
-
 
 
 namespace ft{
@@ -22,7 +21,7 @@ struct pair
 public:
     typedef T1 first_type;
     typedef T2 second_type;
-private:
+public:
     first_type      first;
     second_type     second;
     
