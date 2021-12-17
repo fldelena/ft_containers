@@ -2,7 +2,7 @@
 # define ENABLEIF_HPP
 
 /*
-хз че это вообще
+хз че это вообще 
 */
 
 namespace ft

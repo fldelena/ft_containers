@@ -7,28 +7,24 @@
 #include "vector.hpp"
 
 
-template <class T>
-typename std::enable_if<std::is_integral<T>::value,bool>::type
-  is_odd (T i) {return bool(i%2);}
-
-template <class T, class = typename std::enable_if<std::is_integral<T>::value>::type>
-bool is_even (T i) {return bool(i%2);}
 
 
 int main()
 {
 
 
-  short int i = 1;    // code does not compile if type of i is not integral
 
-  std::cout << std::boolalpha;
-  std::cout << "i is odd: " << is_odd(i) << std::endl;
-  std::cout << "i is even: " << is_even(i) << std::endl;
+int myints[] = {20,40,60,80,100};               //   myints: 20 40 60 80 100
+  std::vector<int>myvector (myints,myints+5);     // myvector: 20 40 60 80 100
+
+  // using default comparison:
+  if ( ft::equal (myvector.begin(), myvector.end(), myints) )
+    std::cout << "The contents of both sequences are equal.\n";
+  else
+    std::cout << "The contents of both sequences differ.\n";
+
 
   return 0;
-
-
-
 
 
 

@@ -11,6 +11,8 @@
 #include "iterator/Pair.hpp"
 #include "iterator/IsIntegral.hpp"
 #include "iterator/EnableIf.hpp"
+#include "iterator/IteratorTraits.hpp"
+#include "iterator/Equal.hpp"
 
 
 
