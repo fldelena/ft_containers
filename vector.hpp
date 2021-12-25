@@ -332,12 +332,12 @@ namespace ft
             size_type pos = 0;
             for(; (it_beg != position) && (it_beg != this->end()); it_beg++)
                 pos++;
-            int crutch = 0;                 // crutch
-            if (pos > _size)                //  |===|
-            {                               //  |___|
-                crutch = pos - _size;       //   | |
-                _size += crutch;            //    ]
-            }                               // crutch
+            int crutch = 0;                 //
+            if (pos > _size)                //
+            {                               //
+                crutch = pos - _size;       //
+                _size += crutch;            //
+            }                               // 
             _size += n;
             if(_capacity == 0)
             {
@@ -347,10 +347,10 @@ namespace ft
             if(_size > _capacity)
             {
                 _capacity = ((_capacity * 2) < _size) ? _size : (_capacity * 2);
-                if(crutch != 0)                     // crutch
-                    _capacity -= crutch;            // crutch
-                if(n == 2 || n == 1)                // crunch
-                    _capacity += (n == 1) ? 2 : 1;  // crunch
+                if(crutch != 0)                     //
+                    _capacity -= crutch;            //
+                if(n == 2 || n == 1)                //
+                    _capacity += (n == 1) ? 2 : 1;  //
                 pointer arr_tmp = _alloc.allocate(_capacity);
                 for(size_type i = 0; i < pos; i++)
                     _alloc.construct(arr_tmp + i, *(_arr + i));
@@ -366,10 +366,10 @@ namespace ft
             else
             {
                 size_type index = 0;
-                if(crutch != 0)                     // crutch
-                    _capacity -= crutch;            // crutch
-                if(n == 2 || n == 1)                // crunch
-                    _capacity += (n == 1) ? 2 : 1;  // crunch
+                if(crutch != 0)                     //
+                    _capacity -= crutch;            //
+                if(n == 2 || n == 1)                //
+                    _capacity += (n == 1) ? 2 : 1;  //
                 for(size_type i =(_size - 1) ; i >= (pos + n); i--)
                 {
                     _alloc.construct(_arr + i, *(_arr + i - pos - n + 1));
