@@ -22,7 +22,7 @@ struct Node :
         this->value = val;
         this->parent = 0;
         this->left = 0;
-        this->rught = 0;
+        this->right = 0;
         this->is_red = true;
         this->is_nil = false; 
     }
@@ -48,7 +48,7 @@ struct Node :
         virtual return(this);
     }
 
-    ~Node(){}
+    virtual ~Node(){}
 };
 
 
@@ -60,13 +60,38 @@ public:
     typedef typename ft::IteratorTraits<T>::value_type       value_type;
     typedef typename ft::IteratorTraits<T>::pointer          pointer;
     typedef typename ft::IteratorTraits<T>::reference        reference;
+    typedef typename ft::Node<value_type>*                   node_p;
 private:
-    Node *_node;
+    node_p _node;
+
+    node_p tree_min(node_p x) const // стр 324 Кормен
+    {
+        while(!x->left->is_nil)
+            x = x->left;
+        return x;
+    }
+
+    node_p tree_max(node_p x) const
+    {
+        while(!x->right->is_nil)
+            x = x->right;
+        return x;
+    }
 
 public:
-    TreeIterator():
+    TreeIterator() {}
+
+    TreeIterator(node_p _node)
+    {
+        this->_node = _node;
+    }
     
-    TreeIterator &operator=(TreeIterator const *other)
+    TreeIterator(TreeIterator<value_type> const &other)
+    {
+        *this = other;
+    }
+
+    TreeIterator &operator=(TreeIterator<value_type> const &other)
     {
         this->_node = other.node;
         return *this;
@@ -74,33 +99,99 @@ public:
 
 
     reference operator*(){
-        return(*this->_node);
+        return(*this->_node->value);
     }
 
     pointer operator->(){
-        return(this->_node);
+        return(this->_node->value);
     }
 
     TreeIterator &operator++(){
-        //Реализовать эту джуйню
+        
+        if(!_node->right->is_nil)
+            _node = tree_min(_node->right)
+        else
+        {
+            node_p y = _node->parent;
+            while(!y->is_nil && _node == y->right)
+            {
+                _node = y;
+                y = y->parent;
+            }
+            _node = y;
+        }
+        return *this;
     }
 
     TreeIterator operator++(int){
-        //Реализовать эту джуйню
+        TreeIterator<value_type> tmp = *this;
+        if(!_node->right->is_nil)
+            _node = tree_min(_node->right)
+        else
+        {
+            node_p y = _node->parent;
+            while(!y->is_nil && _node == y->right)
+            {
+                _node = y;
+                y = y->parent;
+            }
+            _node = y;
+        }
+        return tmp;
+
     }
 
-    TreeIterator &operator++(){
-        //Реализовать эту джуйню
+    TreeIterator &operator--(){
+        if(!_node->left->is_nil)
+            _node = tree_max(_node->left)
+        else
+        {
+            node_p y = _node->parent;
+            while(!y->is_nil && _node == y->left)
+            {
+                _node = y;
+                y = y->parent;
+            }
+            _node = y;
+        }
+        return *this;
     }
 
-    TreeIterator operator++(int){
-        //Реализовать эту джуйню
+    TreeIterator operator--(int){
+        TreeIterator<value_type> tmp = *this;
+        if(!_node->left->is_nil)
+            _node = tree_max(_node->left)
+        else
+        {
+            node_p y = _node->parent;
+            while(!y->is_nil && _node == y->left)
+            {
+                _node = y;
+                y = y->parent;
+            }
+            _node = y;
+        }
+        return tmp;
     }
 
+    node_p getNode() const
+    {
+        return _node;
+    }
 
 };
 
+template<typename A, typename B>
+bool operator==(const TreeIterator<A> &lhs, const TreeIterator<B> &rhs)
+{
+    return  lhs.getNode() == rhs.getNode()
+}
 
+template<typename A, typename B>
+bool operator!=(const TreeIterator<A> &lhs, const TreeIterator<B> &rhs)
+{
+    return  lhs.getNode() != rhs.getNode()
+}
 
 
 }

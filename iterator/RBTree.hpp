@@ -2,6 +2,7 @@
 # define RBTREE_HPP
 #include <memory>
 #include "ReverseIterator.hpp"
+#include "TreeIterator.hpp"
 
 namespace ft {
 
@@ -17,8 +18,8 @@ public:
     typedef     allocator_type::const_reference     const_reference;   
     typedef     allocator_type::pointer             pointer;
     typedef     allocator_type::const_pointer       const_pointer;
-    typedef     /*asdasqqwq*/                       iterator;
-    typedef     /*sefsefsefsf*/                     const_iterator;
+    typedef     TreeIterator<value_type>            iterator;
+    typedef     TreeIterator<const value_type>      const_iterator;
     typedef     ft::ReverseIterator<iterator>       reverse_iterator;
     typedef     ft::ReverseIterator<const_iterator> const_reverse_iterator;
     typedef     std::ptrdiff_t                      difference_type;
