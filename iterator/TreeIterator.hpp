@@ -206,14 +206,4 @@ bool operator!=(const TreeIterator<A> &lhs, const TreeIterator<B> &rhs)
 */
 
 
-
-
-
-
-
-
-
-
-
-
 #endif
