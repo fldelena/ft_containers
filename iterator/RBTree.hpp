@@ -3,6 +3,7 @@
 #include <memory>
 #include "ReverseIterator.hpp"
 #include "TreeIterator.hpp"
+#include "Pair.hpp"
 
 namespace ft {
 
@@ -32,6 +33,7 @@ private:
     allocator_type  _val_alloc;
     node_allocator  _alloc;
     node_pointer    _root;
+    node_pointer    _nil;
     node_pointer    _node;
     value_compare   _compare
 
@@ -166,6 +168,19 @@ private:
         _node->is_red = false;
     }
 
+    void init_nil_root()
+    {
+        _nil = _alloc.allocate(1);
+        _alloc.construct(_nil, Node<value_type>());
+        _nil->is_red = false;
+        _nil->is_nil = true;
+        _root = _alloc.allocate(1);
+        _alloc.construct(_root, Node<value_type>());
+        _root->value = _val_alloc.allocate(1);
+        _val_alloc.construct(_root->value, value_type());
+        _root->is_red = false;
+    }
+
     void rb_transplant(node_pointer u, node_pointer v)
     {
         if(u->parent == _node )
@@ -189,14 +204,14 @@ private:
         }
     }
 
-    void init_nil_head()
+    void free_node(node_pointer node)
     {
-        _nil = _alloc.allocate(1);
-        _alloc.construct(_nil, Node<value_type>);
-        _nil->is_red = false;
-        _nil->is_nil = true;
-        
+        _val_alloc.destroy(node->value);
+        _val_alloc.deallocate(node->value, 1);
+        _node_alloc.deallocate(node, 1); 
     }
+
+
 
 public:
     

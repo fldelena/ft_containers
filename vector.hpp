@@ -38,10 +38,6 @@ namespace ft
         typedef         ReverseIterator<iterator>           reverse_iterator;
         typedef         ReverseIterator<const_iterator>     const_reverse_iterator;
 
-
-
-
-
     private:
         //-------------------------------Param-------------------------------//
         value_type*     _arr;                 
