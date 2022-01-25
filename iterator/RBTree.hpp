@@ -4,6 +4,8 @@
 #include "ReverseIterator.hpp"
 #include "TreeIterator.hpp"
 #include "Pair.hpp"
+#include "EnableIf.hpp"
+#include "IsIntegral.hpp"
 
 namespace ft {
 
@@ -35,7 +37,8 @@ private:
     node_pointer    _root;
     node_pointer    _nil;
     node_pointer    _node;
-    value_compare   _compare
+    value_compare   _compare;
+    size_type       _size_type;
 
     node_pointer _tree_min(node_pointer x) const
     {
@@ -87,14 +90,15 @@ private:
         x->parent = y;
     }
 
-    node_pointer _rb_insert(node_pointer new_node)
+    node_pointer _rb_insert(node_pointer new_node, node_pointer where)
     {
         if (_node == _root)
             _node = new_node;
         else
-            _insert_to_node(_node, new_node);
+            _insert_to_node(where, new_node);
         return new_node;
     }
+
 
     node_pointer _insert_to_node(node_pointer node, node_pointer new_node)
     {
@@ -168,6 +172,75 @@ private:
         _node->is_red = false;
     }
 
+    void rb_erase_fixup(node_pointer node)
+    {
+        while(node != _node && !node->is_red)
+        {
+            if(node == node->parent->left)
+            {
+                node_pointer w_node = node->parent->right;
+                if(w_node->is_red)
+                {
+                    w_node->is_red = false;
+                    node->parent->is_red = true;
+                    _left_rotate(node->parent);
+                    w_node = node->parent->right;
+                }
+                if(!w_node->left->is_red && !w_node->right->is_red)
+                {
+                    w_node->is_red = true;
+                    node = node->parent;
+                }
+                else
+                {
+                    if(!w_node->right->is_red)
+                    {
+                        w_node->left->is_red = false;
+                        w_node->is_red = true;
+                        _right_rotate(w_node);
+                        w_node = node->parent->right;
+                    }
+                    w_node->is_red = node->parent->is_red;
+                    node->parent->is_red = false;
+                    w_node->right->is_red = false;
+                    _left_rotate(node->parent);
+                    node = _node;
+                }
+            }
+            else
+            {
+                node_pointer w_node = node->parent->left;
+                if(w_node->is_red)
+                {
+                    w_node->is_red = false;
+                    node->parent->is_red = true;
+                    _right_rotate(node->parent);
+                    w_node = node->parent->left;
+                }
+                if(!w_node->right->is_red && !w_node->left->is_red)
+                {
+                    w_node->is_red = true;
+                    node = node->parent;
+                }
+                else
+                {
+                    if(!w_node->left->is_red)
+                    {
+                        w_node->right->is_red = false;
+                        w_node->is_red = true;
+                        _left_rotate(w_node);
+                        w_node = node->parent->left;
+                    }
+                    w_node->is_red = node->parent->is_red;
+                    node->parent->is_red = false;
+                    w_node->left->is_red = false;
+                    _right_rotate(node->parent);
+                    node = _node;
+                }
+            } 
+        }
+    }
+
     void init_nil_root()
     {
         _nil = _alloc.allocate(1);
@@ -180,7 +253,65 @@ private:
         _val_alloc.construct(_root->value, value_type());
         _root->is_red = false;
     }
+//
+    pointer create_value(const value_type &value)
+    {
+        pointer new_val = _val_alloc.allocate(1);
+        _val_alloc.construct(new_val, value);
+        return new_val;
+    }
 
+    node_pointer copy_node(node_pointer other)
+    {
+        node_pointer new_node = _alloc.allocate(1);
+        _alloc.construct(new_node, Node<T>());
+        new_node->is_red = other->is_red;
+        new_node->is_nil = other->is_nil;
+        if(other->value)
+        {
+            new_node->value = _val_alloc.allocate(1);
+            _val_alloc.construct(new_node->value, *other->value);
+        }
+        return new_node;
+    }
+
+
+    void copy_child(node_pointer my_node, node_pointer)
+    {
+        if(other->left->is_nil)
+            my_node->left = _nil;
+        else
+        {
+            my_node->left = copy_node(other->left);
+            my_node->left->parent = my_node;
+            copy_child(my_node->left, other->left);
+        }
+        if(other->right->is_nil)
+            my_node->right = _nil;
+        else if (other->right->right == NULL)
+        {
+            my_node->right = _root;
+            _root->parent = my_node;
+        }
+        else
+        {
+            my_node->right = copy_node(other->right);
+            my_node->right->parent = my_node;
+            copy_child(my_node->right, other->right);
+        }
+    }
+
+    node_pointer search(value_type const &value, node_pointer node) const
+    {
+        if(!node || node->is_nil)
+            return NULL;
+        if(_compare(value, *node->value))
+            return search(value, node->left);
+        if(_compare(*node->value, value))
+            return search(value, node->right);
+        return node;
+    }
+//
     void rb_transplant(node_pointer u, node_pointer v)
     {
         if(u->parent == _node )
@@ -208,13 +339,64 @@ private:
     {
         _val_alloc.destroy(node->value);
         _val_alloc.deallocate(node->value, 1);
-        _node_alloc.deallocate(node, 1); 
+        _alloc.deallocate(node, 1); 
     }
 
 
 
 public:
-    
+    //-----------------------------Constructor-------------------------------//
+    rbtree(const key_compare& comp, const allocator_type& alloc) :
+            _compare(comp), _val_alloc(alloc), _alloc(0), _node(0), size(0) 
+    {
+        init_nil_root();
+        _node = _root;
+    }
+
+    rbtree() : _node(0), _val_alloc(allocator_type()), _alloc(node_allocator()), _compare(value_compare()), _size(0) 
+    {
+        init_nil_root();
+        _node = _root;
+    }
+
+    rbtree(rbtree const &other) : _compare(other._compare), _node(NULL)
+    {
+        *this = other
+    }
+
+    template<class InputIterator>
+    rbtree(typename ft::enable_if<>)
+
+    rbtree& operator=(const rbtree &src)
+    {
+        if(this == &src)
+            return *this
+        this->_alloc = src._alloc;
+        this->_val_alloc = src._val_alloc;
+        this->_compare = src._compare;
+        if(this->_node == NULL)
+            init_nil_root();
+        else
+            clear_node(_node);
+        if (src._size == 0)
+            this->_node = this->_root;
+        else
+        {
+            this->_node = copy_node(src._node);
+            copy_child(this->_node, src._node);
+        }
+        this->_size = src._size;
+        return *this;
+    }
+
+    ~rbtree()
+    {
+        clear_node(_node);
+        _val_alloc.destroy(_root->value);
+        _val_alloc.deallocate(_root->value, 1);
+        _alloc.deallocate(_nil, 1);
+        _alloc.deallocate(_root, 1);
+    }
     //------------------------------Iterators--------------------------------//
     iterator begin(){
         return(iterator(_root));
@@ -231,26 +413,224 @@ public:
     const_iterator end() const{
         return(const_iterator(_tree_min(_root)));
     }
-    rbegin
-    rend
+    reverse_iterator rbegin()
+    {
+        return(reverse_iterator(end()));
+    }
+    const_reverse_iterator rbegin() const
+    {
+        return(const_reverse_iterator(end()));
+    }
+    reverse_iterator rend()
+    {
+        return(reverse_iterator(begin()));
+    }
+    const_reverse_iterator rend() const
+    {
+        return(const_reverse_iterator(begin()));
+    }
     //------------------------------Capacity---------------------------------//
-    empty
-    size
-    max_size
+    bool empty() const
+    {
+        return(_size == 0);
+    }
+    size_type size() const
+    {
+        return _size;
+    }
+    size_type max_size() const
+    {
+        return _alloc.max_xize();
+    }
     //---------------------------Element access------------------------------//
     operator[] // map
     //------------------------------Modifiers--------------------------------//
-    insert
-    erase
-    swap
-    clear
+    pair<iterator,bool> insert (const value_type& val)
+    {
+        node_pointer found_val = search(val, _node);
+        if(found_val)
+            return ft::pair<iterator, bool>(iterator(found_val), false);
+        node_pointer new_node = _alloc.allocate(1);
+        _alloc.construct(new_node, Node<value_type>(create_value(val)));
+        new_node->left = _nil;
+        new_node->right = _nil;
+        _rb_insert(new_node, _node);
+        ft::pair<iterator, bool> ret(iterator(new_node), true);
+        rb_insert_fixup(new_node);
+        _size++;
+        // new_node = _tree_max(_node);
+        // new_node->right = _root;
+        // _root->parent = new_node;
+        return ret;
+    }
+
+    iterator insert (iterator position, const value_type& val)
+    {
+        node_pointer found_val = search(val, _node);
+        if(found_val)
+            return iterator(found_val);
+        node_pointer new_node = _alloc.allocate(1);
+        _alloc.construct(new_node, Node<value_type>(create_value(val)));
+        new_node->left = _nil;
+        new_node->right = _nil;
+        if(position == begin()) 
+        {
+            if(position != end() && _compare(value, *position))
+                _rb_insert(new_node, tree_min(_node));
+            else
+                _rb_insert(new_node, _node);
+        }
+        else if(position == end())
+        {
+            if(position != begin() && _compare(*(--position), value))
+                _rb_insert(new_node, _root->parent);
+            else
+                _rb_insert(new_node, _node);
+        }
+        else
+            _rb_insert(new_node, _node);
+        rb_insert_fixup(new_node);
+        _size++;
+        // node_pointer max_of_tree = _tree_max(_root);
+        // max_of_tree->right = _root;
+        // _root->parent = max_of_tree;
+        return iterator(new_node);
+    }
+
+    template <class InputIterator>
+    void insert(typename ft::enable_if< !ft::is_integral<InputIterator>::value, InputIterator >::type first, InputIterator last)
+    {
+        for(; first != last; ++first)
+            insert(*first);
+    }
+
+
+    void erase (iterator position) // возможно подправить
+	{
+        node_pointer y = position.Node();
+        node_pointer x;
+        bool y_original_is_red = y->is_red;
+        if(position->left->is_nil)
+        {
+            x = position->right;
+            rb_transplant(position, position->right);
+        }
+        else if (position->right->is_nil)
+        {
+            x = position->left;
+            rb_transplant(position, position->left);
+        }
+        else
+        {
+            y = _tree_min(position->right)
+            y_original_is_red = y->is_red;
+            x = y->right;
+            if(y->parent == position)
+            {
+                x->parent = y;
+            }
+            else
+            {
+                rb_transplant(y, y->right);
+                y->right = position->right;
+                y->right->parent = y;
+                rb_transplant(position, y);
+                y->left = position->left;
+                y->left->parent = y;
+                y->is_red = position->is_red;
+            }
+        }
+        if(!y_original_is_red)
+            rb_erase_fixup(x);
+        _size--;
+        _nil->parent = NULL;
+        if(_size == 0)
+            _node = _root;
+        else
+        {
+            if(_size != 1)
+                x = _tree_max(_node);
+            else
+                x = _node;
+            x->right = _root;
+            _root->parent = x;
+        }
+    }
+
+    size_type erase (const key_type& k)
+    {
+        node_pointer res = search(k, _node);
+        if(res)
+            erase(iterator(res));
+        return (res != NULL);
+    }
+	
+    void erase (iterator first, iterator last)
+    {
+        while (first != last)
+            erase(first++); 
+    }
+
+
+    void swap (map& x)
+    {
+        std::swap(this->_alloc, x._alloc);
+        std::swap(this->_root, x._root);
+        std::swap(this->_node, x._node);
+        std::swap(this->_nil, x._nil);
+        std::swap(this->_compare, x._compare);
+        std::swap(this->_size, x._size);
+        std::swap(this->_val_alloc, x._val_alloc);
+    }
+
+    void clear()
+    {
+        clear_node(_node);
+        _node = _root;
+        _root->parent = NULL;
+        _size = 0;
+    }
     //------------------------------Observers--------------------------------//
-    key_comp
-    value_comp
+    //key_comp() map, set
+    value_compare value_comp() const
+    {
+        return(this->_compare);
+    }
     //------------------------------Operations-------------------------------//
-    find
-    count
-    lower_bound
+    iterator find (const value_type& k)
+    {
+        node_pointer find_ret = search(k, _node);
+        return(find_ret == NULL ? end() : iterator(find_ret));
+    }
+    const_iterator find (const value_type& k) const
+    {
+        node_pointer find_ret = search(k, _node);
+        return(find_ret == NULL ? end() : const_iterator(find_ret));
+    }
+    
+    size_type count (const value_type& k) const
+    {
+        if(find(k) != end())
+            return 1;
+        return 0;
+    }
+
+    iterator lower_bound (const value_type& k)
+    {
+        iterator last = end();
+        for(iterator first = begin(); first != last; first++)
+        {
+            if(_compare(*first, value))
+                return(first);
+        }
+        return last;
+    }
+    const_iterator lower_bound (const key_type& k) const
+    {
+
+    }
+
+
     upper_bound
     equal_range
     //------------------------------Allocator--------------------------------//

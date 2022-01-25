@@ -48,38 +48,35 @@ public:
 private:
 
         tree_type       _tree;
-        allocator_type  _alloc;
-        key_compare     _compare;
+        allocator_type  _alloc; // возмоожно в дальнейшем не пригодится
+        key_compare     _compare; // и это тоже
 
 public:
-    explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) :
+    //----------------------------Constructor----------------------------//
+    explicit map (const key_compare& comp = key_compare(),
+                                            const allocator_type& alloc = allocator_type()) :
                     _tree(tree_type(comp, alloc)), _alloc(alloc), _compare(comp) {}
+
+    template <class InputIterator>
+    map (InputIterator first, InputIterator last, const key_compare& comp = key_kompare(),
+                                            const allocator_type &alloc = allocator_type()) :
+                    _tree(tree_type(comp, alloc)), _alloc(alloc), _compare(comp)
+    {
+        this->rb.tree.insert(first, last);
+    }
+
+    map (const map& x) : _tree(tree_type(x._tree)) {}
+
+
+    ~map(){}
+
          
-
-
-
 
 
 };
 
 
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
 
 
 #endif
