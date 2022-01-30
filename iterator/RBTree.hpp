@@ -21,66 +21,66 @@ public:
     typedef     typename allocator_type::const_reference    const_reference;   
     typedef     typename allocator_type::pointer            pointer;
     typedef     typename allocator_type::const_pointer      const_pointer;
-    typedef     TreeIterator<value_type>                    iterator;
-    typedef     TreeIterator<const value_type>              const_iterator;
+    typedef     TreeIterator<T>                             iterator;
+    typedef     TreeIterator<const T>                       const_iterator;
     typedef     ft::ReverseIterator<iterator>               reverse_iterator;
     typedef     ft::ReverseIterator<const_iterator>         const_reverse_iterator;
     typedef     std::ptrdiff_t                              difference_type;
     typedef     std::size_t                                 size_type;
-    typedef     allocator_type::template
-                rebind<Node<value_type>>::other             node_allocator;
+    typedef     typename Alloc::template
+                rebind<Node<value_type> >::other            node_allocator;
     typedef     typename node_allocator::pointer            node_pointer;
 private:
 
     allocator_type  _val_alloc;
-    node_allocator  _alloc;
+    node_allocator  _node_alloc;
     node_pointer    _root;
     node_pointer    _nil;
     node_pointer    _node;
     value_compare   _compare;
-    size_type       _size_type;
+    size_type       _size;
 
-    node_pointer _tree_min(node_pointer x) const
+    node_pointer _tree_min(node_pointer x) const // tree_min
     {
-        while(!x->left->is_nil)
+        while(x != NULL && !is_nil(x->left))
             x = x->left;
         return x;
     }
 
-    node_pointer _tree_max(node_pointer x) const
+    node_pointer _tree_max(node_pointer x) const // tree_max
     {
-        while(!x->right->is_nil)
+        while(x != NULL && !is_nil(x->right))
             x = x->right;
         return x;
     }
 
-    void _left_rotate(node_pointer x)
+    void _left_rotate(node_pointer x) // _rotate_left
     {
         node_pointer y = x->right;
         x->right = y->left;
          
-        if(!y->left->is_nil)
+        if(!is_nil(y->left))
             y->left->parent = x;
         y->parent = x->parent;
-        if(x->parent->is_nil)
+        if(x->parent == NULL)
             _node = y;
         else if (x == x->parent->left)
             x->parent->left = y;
-        else()
+        else
             x->parent->right = y;
         y->left = x;
         x->parent = y;
     }
 
-    void _right_rotate(node_pointer x)
+    void _right_rotate(node_pointer x) // _rotate_right
     {
         node_pointer y = x->left;
         x->left = y = right;
 
-        if(!y->right->is_nil)
+        if(!is_nil(y->right))
             y->right->parent = x;
         y->parent = x->parent;
-        if(x->parent->is_nil)
+        if(x->parent == NULL)
             _node = y;
         else if(x == x->parent->left)
             x->parent->left = y;
@@ -90,7 +90,7 @@ private:
         x->parent = y;
     }
 
-    node_pointer _rb_insert(node_pointer new_node, node_pointer where)
+    node_pointer _rb_insert(node_pointer new_node, node_pointer where) //_insert_into_tree
     {
         if (_node == _root)
             _node = new_node;
@@ -100,27 +100,28 @@ private:
     }
 
 
-    node_pointer _insert_to_node(node_pointer node, node_pointer new_node)
+    node_pointer _insert_to_node(node_pointer node, node_pointer new_node) // _insert_to_node
     {
-        if (_compare(*node->value, *new_node->value)) // return x<y;
+        if (_compare(*new_node->value, *node->value)) // return x<y;
         {
-            if(!node->right->is_nil)
-                return (_insert_to_node(node->right, new_node));
-            node->right = new_node;
+            if(!is_nil(node->left))
+                return (_insert_to_node(node->left, new_node));
+            node->left = new_node;
         }
         else
         {
-            if(!node->left->is_nil)
-                return (_insert_to_node(node->left, new_node));
-            node->left = new_node;
+            if(!is_nil(node->right))
+                return (_insert_to_node(node->right, new_node));
+            node->right = new_node;
         }
         new_node->parent = node;
         return new_node;
     }
 
-    void rb_insert_fixup(node_pointer node)
+    void rb_insert_fixup(node_pointer node) // _insert_fixup
     {
-        while(node->parent->is_red)
+        if (node != _node && node->parent != _node){
+        while(node != _node && node->parent->is_red)
         {
             if(node->parent == node->parent->parent->left)
             {
@@ -169,10 +170,11 @@ private:
             }
 
         }
+        }
         _node->is_red = false;
     }
 
-    void rb_erase_fixup(node_pointer node)
+    void rb_erase_fixup(node_pointer node) // erase_fixup
     {
         while(node != _node && !node->is_red)
         {
@@ -241,16 +243,20 @@ private:
         }
     }
 
-    void init_nil_root()
+    bool is_nil(node_pointer node) const { // is_nil
+        return node == _nil || node == _root;
+    }
+
+    void init_nil_root() //init_nil_head
     {
-        _nil = _alloc.allocate(1);
-        _alloc.construct(_nil, Node<value_type>());
+        _nil = _node_alloc.allocate(1);
+        _node_alloc.construct(_nil, Node<T>());
         _nil->is_red = false;
         _nil->is_nil = true;
-        _root = _alloc.allocate(1);
-        _alloc.construct(_root, Node<value_type>());
+        _root = _node_alloc.allocate(1);
+        _node_alloc.construct(_root, Node<T>());
         _root->value = _val_alloc.allocate(1);
-        _val_alloc.construct(_root->value, value_type());
+        _val_alloc.construct(_root->value, T());
         _root->is_red = false;
     }
 //
@@ -312,9 +318,9 @@ private:
         return node;
     }
 //
-    void rb_transplant(node_pointer u, node_pointer v)
+    void rb_transplant(node_pointer u, node_pointer v) // transplant
     {
-        if(u->parent == _node )
+        if(u == _node )
             _node = v;
         else if(u == u->parent->left)
             u->parent->left = v;
@@ -323,19 +329,19 @@ private:
         v->parent = u->parent;
     }
 
-    void clear_node(node_pointer node)
+    void clear_node(node_pointer node) // clear_node
     {
-        if(!node->is_nil)
+        if(node && !is_nil(node))
         {
             clear_node(node->right);
             clear_node(node->left);
             _val_alloc.destroy(node->value);
-            _val_alloc.destroy(node->value, 1);
-            _alloc.deallocate(node, 1);
+            _val_alloc.deallocate(node->value, 1);
+            _node_alloc.deallocate(node, 1);
         }
     }
 
-    void free_node(node_pointer node)
+    void free_node(node_pointer node) //free_node
     {
         _val_alloc.destroy(node->value);
         _val_alloc.deallocate(node->value, 1);
