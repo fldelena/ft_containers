@@ -586,9 +586,9 @@ public:
     }
 
 
-    void swap (map& x)
+    void swap (rbtree& x) // done
     {
-        std::swap(this->_alloc, x._alloc);
+        std::swap(this->_node_alloc, x._node_alloc);
         std::swap(this->_root, x._root);
         std::swap(this->_node, x._node);
         std::swap(this->_nil, x._nil);
@@ -629,29 +629,67 @@ public:
         return 0;
     }
 
-    iterator lower_bound (const value_type& k)
+    iterator lower_bound (const value_type& k) // done
     {
         iterator last = end();
-        for(iterator first = begin(); first != last; first++)
+        for(iterator first = begin(); first != last; ++first)
         {
-            if(_compare(*first, value))
+            if(!_compare(*first, value))
                 return(first);
         }
         return last;
     }
-    const_iterator lower_bound (const key_type& k) const
-    {
 
+    const_iterator lower_bound (const key_type& k) const //done
+    {
+        const_iterator last = end();
+        for (const_iterator first = begin(); first != last; ++first)
+        {
+            if(!_compare(*first, value))
+                return first;
+        }
+        return last;
     }
 
+    iterator upper_bound(const value_type& value) // done
+    {
+        iterator last = end();
+        for(iterator first = begin(); first != last; ++first)
+        {
+            if(_compare(value, *first))
+                return (first);
+        }
+        return last;
+    }
 
-    upper_bound
-    equal_range
+    const_iterator upper_bound(const value_type& value) const // done
+    {
+        const_iterator last = end();
+        for(const_iterator first = begin(); first != last; ++first)
+        {
+            if(_compare(value, *first))
+                return first;
+        }
+        return last;
+    }
+
+    ft::pair<iterator, iterator> equal_range(const value_type &value) // done
+    {
+        return(ft::make_pair(lower_bound(value), upper_bound(value)));
+    }
+
     //------------------------------Allocator--------------------------------//
-    get_allocator
+    allocator_type get_allocator() const{ //done
+        return (_val_alloc);
+    }
 
 };
 
+template<class Content, class Compare, class Alloc>
+bool operator<(const rbtree<Content, Compare, Alloc>& lhs, const rbtree<Content, Compare, Alloc>& rhs)
+{
+    return (ft::lexicographical_compare)
+}
 
 }
 
