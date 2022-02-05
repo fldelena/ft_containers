@@ -1,6 +1,8 @@
 #ifndef ITERATORTRAITS_HPP
 # define ITERATORTRAITS_HPP
 
+#include <iterator>
+
 /*
     Класс, определяющий свойства итераторов
 */
@@ -11,15 +13,15 @@ namespace ft {
 
     template<class T> struct remove_const <const T> { typedef T type; };
 
-template <class Iterator>
+template <class Iterator> 
 class iterator_traits
 {
-public:
-    typedef     typename Iterator::difference_type       difference_type;
-    typedef     typename Iterator::value_type            value_type;
-    typedef     typename Iterator::pointer               pointer;
-    typedef     typename Iterator::reference             reference;
-    typedef     typename Iterator::iterator_category	 iterator_category;
+	public:
+		typedef typename Iterator::difference_type	    difference_type;
+		typedef typename Iterator::value_type		    value_type;
+		typedef typename Iterator::pointer			    pointer;
+		typedef typename Iterator::reference			reference;
+		typedef typename Iterator::iterator_category	iterator_category;
 };
 
 template <class T>
@@ -46,6 +48,5 @@ public:
 };
 
 }
-
 
 #endif

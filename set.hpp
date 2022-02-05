@@ -8,8 +8,7 @@
 namespace ft {
 
 
-template <class Key, class Compare = std::less<Key>,
-                class Alloc = std::allocator<Key> >
+template <class Key, class Compare = std::less<Key>, class Alloc = std::allocator<Key> >
 class set
 {
 public:
@@ -25,7 +24,7 @@ public:
 	typedef    const value_type&                               const_reference;
 	typedef    typename allocator_type::pointer                pointer;
 	typedef    typename allocator_type::const_pointer          const_pointer;
-	typedef    rbtree<value_type, key_compare, allocator_type> tree_type;
+	typedef    RBTree<value_type, key_compare, allocator_type> tree_type;
 	typedef    typename tree_type::iterator                    iterator;
 	typedef    typename tree_type::const_iterator              const_iterator;
 	typedef    typename tree_type::reverse_iterator            reverse_iterator;

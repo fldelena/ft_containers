@@ -53,31 +53,30 @@ public:
     }
 
     //--------------------------Relational operators-------------------------//
-    template <class T, class Container>
-    bool operator== (const stack<T,Container>& lhs, const stack<T,Container>& rhs) {
+    template <class stack_type, class container_type>
+    friend bool operator== (const stack<stack_type,container_type>& lhs, const stack<stack_type,container_type>& rhs) {
         return (lhs.c == rhs.c);
     }
-    template <class T, class Container>
-    bool operator!= (const stack<T,Container>& lhs, const stack<T,Container>& rhs){
+    template <class stack_type, class container_type>
+    friend bool operator!= (const stack<stack_type,container_type>& lhs, const stack<stack_type,container_type>& rhs){
         return (lhs.c != rhs.c);
     }
-    template <class T, class Container>
-    bool operator<  (const stack<T,Container>& lhs, const stack<T,Container>& rhs){
+    template <class stack_type, class container_type>
+    friend bool operator<  (const stack<stack_type,container_type>& lhs, const stack<stack_type,container_type>& rhs){
         return (lhs.c < rhs.c);
     }
-    template <class T, class Container>
-    bool operator<= (const stack<T,Container>& lhs, const stack<T,Container>& rhs){
+    template <class stack_type, class container_type>
+    friend bool operator<= (const stack<stack_type,container_type>& lhs, const stack<stack_type,container_type>& rhs){
         return (lhs.c <= rhs.c);
     }
-    template <class T, class Container>
-    bool operator>  (const stack<T,Container>& lhs, const stack<T,Container>& rhs){
+    template <class stack_type, class container_type>
+    friend bool operator>  (const stack<stack_type,container_type>& lhs, const stack<stack_type,container_type>& rhs){
         return (lhs.c > rhs.c);
     }
-    template <class T, class Container>
-    bool operator>= (const stack<T,Container>& lhs, const stack<T,Container>& rhs){
+    template <class stack_type, class container_type>
+    friend bool operator>= (const stack<stack_type,container_type>& lhs, const stack<stack_type,container_type>& rhs){
         return (lhs.c >= rhs.c);
     }
-
 };
 
 }

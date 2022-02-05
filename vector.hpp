@@ -6,7 +6,7 @@
 #include <memory>
 #include <stdexcept>
 #include "iterator/VectorIterator.hpp"
-#include "iterator/ReverseIterator.hpp"
+// #include "iterator/ReverseIterator.hpp"
 #include "iterator/LexicographicalCompare.hpp"
 #include "iterator/Pair.hpp"
 #include "iterator/IsIntegral.hpp"
@@ -16,8 +16,65 @@
 
 
 
+
+
+
 namespace ft
 {
+
+template<typename It>
+class ReverseIterator: public It
+{
+public:
+	using typename It::value_type;
+    using typename It::pointer;
+    using typename It::const_pointer;
+    using typename It::reference;
+    using typename It::const_reference;
+    using typename It::difference_type;
+public:
+	ReverseIterator(): It() {}
+	ReverseIterator(It const &it): It(it) {}
+	ReverseIterator(ReverseIterator const &other): It(other.p) {}
+	ReverseIterator &operator=(ReverseIterator const &other) {
+		this->p = other.p;
+		return (*this);
+	}
+
+	reference operator*() {
+		It tmp(*this);
+		return (*--tmp);
+	}
+	const_reference operator*() const {
+		It tmp(*this);
+		return (*--tmp);
+	}
+	pointer operator->() {
+		It tmp(*this);
+		return (&*--tmp);
+	}
+	const_pointer operator->() const {
+		It tmp(*this);
+		return (&*--tmp);
+	}
+	ReverseIterator operator++(int) {
+		ReverseIterator tmp(*this);
+		operator++();
+		return (tmp);
+	}
+	It &operator++() {
+		return (this->It::operator--());
+	}
+	ReverseIterator operator--(int) {
+		ReverseIterator tmp(*this);
+		operator--();
+		return (tmp);
+	}
+	It &operator--() {
+		return (this->It::operator++());
+	}
+};
+
 
     template <class T, class Alloc = std::allocator<T> >
     class vector
@@ -245,13 +302,13 @@ namespace ft
         void assign (int n, const value_type& val)
         {
             this->clear();
-            if(_capacity < n)
+            if((size_type)_capacity < (size_type)n)
             {
                 _capacity = n;
                 _arr = _alloc.allocate(_capacity);
             }
             _size = n;
-            for(int i = 0; i < _size; i++)
+            for(size_type i = 0; i < _size; i++)
             {
                 _alloc.construct(_arr + i, val);
             }
@@ -277,7 +334,7 @@ namespace ft
                 _arr = _alloc.allocate(_capacity);
             }
             _size = count;
-            for(int i = 0; i < _size; i++, first++)
+            for(size_type i = 0; i < _size; i++, first++)
                 _alloc.construct(_arr + i, *first);
         }
         
@@ -350,7 +407,7 @@ namespace ft
                 pointer arr_tmp = _alloc.allocate(_capacity);
                 for(size_type i = 0; i < pos; i++)
                     _alloc.construct(arr_tmp + i, *(_arr + i));
-                for(size_type i = 0; i < n; i++)
+                for(int i = 0; i < n; i++)
                     _alloc.construct(arr_tmp + pos + i, val);
                 for(size_type i = (pos + n); i < _size; i++)
                     _alloc.construct(arr_tmp + i, *(_arr + i - n));
@@ -361,7 +418,7 @@ namespace ft
             }
             else
             {
-                size_type index = 0;
+                // size_type index = 0;
                 if(crutch != 0)                     //
                     _capacity -= crutch;            //
                 if(n == 2 || n == 1)                //
@@ -371,7 +428,7 @@ namespace ft
                     _alloc.construct(_arr + i, *(_arr + i - pos - n + 1));
                     _alloc.destroy(_arr + i - pos - n + 1);
                 }
-                for(size_type i = 0; i < n; i++)
+                for(int i = 0; i < n; i++)
                     _alloc.construct(_arr + (pos + i), val);
             }
 
@@ -440,7 +497,7 @@ namespace ft
 
         iterator erase (iterator first, iterator last)
         {
-            size_type old_size = _size;
+            // size_type old_size = _size;
             size_type count = 0;
             size_type pos = 0;
             iterator first_tmp = first;
